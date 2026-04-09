@@ -28,6 +28,8 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
       viewBox={`-20 -20 ${COURT_WIDTH + 40} ${COURT_HEIGHT + 40}`}
       className="padel-court-svg"
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="xMidYMid meet"
+      style={{ aspectRatio: `${COURT_WIDTH + 40} / ${COURT_HEIGHT + 40}` }}
     >
       <defs>
         {/* Glass wall pattern */}
@@ -38,9 +40,9 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
 
         {/* Court surface gradient */}
         <linearGradient id="court-surface" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#1a6b3c" />
-          <stop offset="50%" stopColor="#1d7a44" />
-          <stop offset="100%" stopColor="#1a6b3c" />
+          <stop offset="0%" stopColor="#1a4a7a" />
+          <stop offset="50%" stopColor="#1e5590" />
+          <stop offset="100%" stopColor="#1a4a7a" />
         </linearGradient>
 
         {/* Glow filter for highlighted player */}
@@ -62,7 +64,7 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
       </defs>
 
       {/* Court background (outside area) */}
-      <rect x="-20" y="-20" width={COURT_WIDTH + 40} height={COURT_HEIGHT + 40} fill="#0d3d1f" rx="4" />
+      <rect x="-20" y="-20" width={COURT_WIDTH + 40} height={COURT_HEIGHT + 40} fill="#0c2d4a" rx="4" />
 
       {/* Court surface */}
       <rect x="0" y="0" width={COURT_WIDTH} height={COURT_HEIGHT} fill="url(#court-surface)" />
@@ -92,13 +94,21 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
       <circle cx="-2" cy={COURT_HEIGHT / 2} r="3" fill="#888" stroke="#666" strokeWidth="1" />
       <circle cx={COURT_WIDTH + 2} cy={COURT_HEIGHT / 2} r="3" fill="#888" stroke="#666" strokeWidth="1" />
 
-      {/* Service lines - 3m from net = 60 units from center */}
-      <line x1="0" y1={COURT_HEIGHT / 2 - 60} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 - 60} stroke="white" strokeWidth="1.5" />
-      <line x1="0" y1={COURT_HEIGHT / 2 + 60} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 + 60} stroke="white" strokeWidth="1.5" />
+      {/* Service lines - 6.95m from back wall = ~3m from net = 61 units from center */}
+      <line x1="0" y1={COURT_HEIGHT / 2 - 61} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 - 61} stroke="white" strokeWidth="1.5" />
+      <line x1="0" y1={COURT_HEIGHT / 2 + 61} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 + 61} stroke="white" strokeWidth="1.5" />
 
       {/* Center service lines */}
-      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2 - 60} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2} stroke="white" strokeWidth="1.5" />
-      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2 + 60} stroke="white" strokeWidth="1.5" />
+      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2 - 61} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2} stroke="white" strokeWidth="1.5" />
+      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2 + 61} stroke="white" strokeWidth="1.5" />
+
+      {/* Distance markers (subtle) */}
+      {/* 3m mark from net */}
+      <text x={COURT_WIDTH + 12} y={COURT_HEIGHT / 2 + 61} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="7">3m</text>
+      {/* 7m mark from net to back wall */}
+      <text x={COURT_WIDTH + 12} y={COURT_HEIGHT / 2 + 61 + 70} textAnchor="middle" fill="rgba(255,255,255,0.15)" fontSize="7">7m</text>
+      {/* Net label */}
+      <text x={COURT_WIDTH + 14} y={COURT_HEIGHT / 2 + 3} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="7">net</text>
 
       {/* Side labels */}
       <text x={COURT_WIDTH / 2} y={COURT_HEIGHT - 10} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontWeight="bold">
