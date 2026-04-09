@@ -15,37 +15,38 @@ interface PadelCourtProps {
   playerSide: PlayerSide
 }
 
-// Court dimensions: 20m x 10m, scaled to SVG viewBox
-// We use a viewBox of 200x400 (1 unit = 0.05m)
-const COURT_WIDTH = 200
-const COURT_HEIGHT = 400
+// Padel court: 20m x 10m
+// Scale: 1m = 20 units
+// ViewBox content: 200 x 400
+const CW = 200  // court width (10m)
+const CH = 400  // court height (20m)
+const NET = CH / 2  // net at center (200)
+const SL = 61       // service line: 3.05m from net
+const WALL_GLASS = 60   // glass back wall: 3m high (visual thickness = 6)
+const WALL_SIDE_GLASS = 80 // side glass: 4m from each back wall
+const PAD = 16 // padding around court
 
 export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, animationStep, playerSide }) => {
   const leftLabel = playerSide === 'left' ? 'JOUW KANT' : 'PARTNER'
   const rightLabel = playerSide === 'right' ? 'JOUW KANT' : 'PARTNER'
+
   return (
     <svg
-      viewBox={`-20 -20 ${COURT_WIDTH + 40} ${COURT_HEIGHT + 40}`}
+      viewBox={`${-PAD} ${-PAD} ${CW + PAD * 2} ${CH + PAD * 2}`}
       className="padel-court-svg"
       xmlns="http://www.w3.org/2000/svg"
       preserveAspectRatio="xMidYMid meet"
-      style={{ aspectRatio: `${COURT_WIDTH + 40} / ${COURT_HEIGHT + 40}` }}
+      style={{ aspectRatio: `${CW + PAD * 2} / ${CH + PAD * 2}` }}
     >
       <defs>
-        {/* Glass wall pattern */}
-        <pattern id="glass-pattern" x="0" y="0" width="10" height="10" patternUnits="userSpaceOnUse">
-          <rect width="10" height="10" fill="transparent" />
-          <line x1="0" y1="0" x2="10" y2="10" stroke="rgba(255,255,255,0.08)" strokeWidth="0.5" />
-        </pattern>
-
-        {/* Court surface gradient */}
-        <linearGradient id="court-surface" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#1a4a7a" />
-          <stop offset="50%" stopColor="#1e5590" />
-          <stop offset="100%" stopColor="#1a4a7a" />
+        <linearGradient id="court-surface" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1565a8" />
+          <stop offset="100%" stopColor="#1259a0" />
         </linearGradient>
-
-        {/* Glow filter for highlighted player */}
+        <linearGradient id="service-box" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stopColor="#1872b8" />
+          <stop offset="100%" stopColor="#1668ac" />
+        </linearGradient>
         <filter id="player-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="3" result="blur" />
           <feMerge>
@@ -53,8 +54,12 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
             <feMergeNode in="SourceGraphic" />
           </feMerge>
         </filter>
-
-        {/* Arrow marker */}
+        {/* Net pattern - crosshatch */}
+        <pattern id="net-pattern" x="0" y="0" width="6" height="4" patternUnits="userSpaceOnUse">
+          <rect width="6" height="4" fill="none" />
+          <line x1="0" y1="0" x2="6" y2="4" stroke="white" strokeWidth="0.3" opacity="0.5" />
+          <line x1="6" y1="0" x2="0" y2="4" stroke="white" strokeWidth="0.3" opacity="0.5" />
+        </pattern>
         <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#FFD700" />
         </marker>
@@ -63,103 +68,108 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
         </marker>
       </defs>
 
-      {/* Court background (outside area) */}
-      <rect x="-20" y="-20" width={COURT_WIDTH + 40} height={COURT_HEIGHT + 40} fill="#0c2d4a" rx="4" />
+      {/* === SURROUNDING AREA === */}
+      <rect x={-PAD} y={-PAD} width={CW + PAD * 2} height={CH + PAD * 2} fill="#0a2240" rx="4" />
 
-      {/* Court surface */}
-      <rect x="0" y="0" width={COURT_WIDTH} height={COURT_HEIGHT} fill="url(#court-surface)" />
+      {/* === COURT SURFACE === */}
+      {/* Main court */}
+      <rect x="0" y="0" width={CW} height={CH} fill="url(#court-surface)" />
 
-      {/* Glass walls - back walls (full) */}
-      <rect x="-4" y="-4" width={COURT_WIDTH + 8} height="4" fill="#4a90d9" opacity="0.3" />
-      <rect x="-4" y={COURT_HEIGHT} width={COURT_WIDTH + 8} height="4" fill="#4a90d9" opacity="0.3" />
+      {/* Service boxes - slightly different shade to distinguish */}
+      <rect x="0" y={NET - SL} width={CW / 2} height={SL} fill="url(#service-box)" opacity="0.6" />
+      <rect x={CW / 2} y={NET - SL} width={CW / 2} height={SL} fill="url(#service-box)" opacity="0.6" />
+      <rect x="0" y={NET} width={CW / 2} height={SL} fill="url(#service-box)" opacity="0.6" />
+      <rect x={CW / 2} y={NET} width={CW / 2} height={SL} fill="url(#service-box)" opacity="0.6" />
 
-      {/* Glass walls - side walls (partial - first 4m from back = 80 units) */}
-      <rect x="-4" y="-4" width="4" height="84" fill="#4a90d9" opacity="0.3" />
-      <rect x={COURT_WIDTH} y="-4" width="4" height="84" fill="#4a90d9" opacity="0.3" />
-      <rect x="-4" y={COURT_HEIGHT - 80} width="4" height="84" fill="#4a90d9" opacity="0.3" />
-      <rect x={COURT_WIDTH} y={COURT_HEIGHT - 80} width="4" height="84" fill="#4a90d9" opacity="0.3" />
+      {/* === WALLS === */}
+      {/* Back walls - glass (3m high, thicker visual) */}
+      <rect x="-6" y="-6" width={CW + 12} height="6" fill="#5ba3d9" opacity="0.45" rx="1" />
+      <rect x="-6" y={CH} width={CW + 12} height="6" fill="#5ba3d9" opacity="0.45" rx="1" />
 
-      {/* Wire fence - side walls (middle section) */}
-      <rect x="-4" y="80" width="4" height={COURT_HEIGHT - 160} fill="#4a90d9" opacity="0.1" />
-      <rect x={COURT_WIDTH} y="80" width="4" height={COURT_HEIGHT - 160} fill="#4a90d9" opacity="0.1" />
+      {/* Side walls - glass section (4m from each back corner) */}
+      <rect x="-6" y="-6" width="6" height={WALL_SIDE_GLASS + 6} fill="#5ba3d9" opacity="0.4" rx="1" />
+      <rect x={CW} y="-6" width="6" height={WALL_SIDE_GLASS + 6} fill="#5ba3d9" opacity="0.4" rx="1" />
+      <rect x="-6" y={CH - WALL_SIDE_GLASS} width="6" height={WALL_SIDE_GLASS + 6} fill="#5ba3d9" opacity="0.4" rx="1" />
+      <rect x={CW} y={CH - WALL_SIDE_GLASS} width="6" height={WALL_SIDE_GLASS + 6} fill="#5ba3d9" opacity="0.4" rx="1" />
 
-      {/* Court lines */}
+      {/* Side walls - wire fence (middle section) - dashed to show it's open mesh */}
+      <line x1="-3" y1={WALL_SIDE_GLASS} x2="-3" y2={CH - WALL_SIDE_GLASS} stroke="#5ba3d9" strokeWidth="2" strokeDasharray="4 3" opacity="0.25" />
+      <line x1={CW + 3} y1={WALL_SIDE_GLASS} x2={CW + 3} y2={CH - WALL_SIDE_GLASS} stroke="#5ba3d9" strokeWidth="2" strokeDasharray="4 3" opacity="0.25" />
+
+      {/* Door openings (center of fence sections) */}
+      <rect x="-6" y={NET - 15} width="6" height="30" fill="#0a2240" opacity="0.6" rx="1" />
+      <rect x={CW} y={NET - 15} width="6" height="30" fill="#0a2240" opacity="0.6" rx="1" />
+
+      {/* === COURT LINES === */}
       {/* Outer boundary */}
-      <rect x="0" y="0" width={COURT_WIDTH} height={COURT_HEIGHT} fill="none" stroke="white" strokeWidth="2" />
+      <rect x="0" y="0" width={CW} height={CH} fill="none" stroke="white" strokeWidth="2" />
 
-      {/* Center line (net) */}
-      <line x1="0" y1={COURT_HEIGHT / 2} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2} stroke="white" strokeWidth="3" />
-
+      {/* Net */}
+      <rect x="0" y={NET - 2} width={CW} height="4" fill="url(#net-pattern)" />
+      <line x1="0" y1={NET} x2={CW} y2={NET} stroke="white" strokeWidth="2.5" />
       {/* Net posts */}
-      <circle cx="-2" cy={COURT_HEIGHT / 2} r="3" fill="#888" stroke="#666" strokeWidth="1" />
-      <circle cx={COURT_WIDTH + 2} cy={COURT_HEIGHT / 2} r="3" fill="#888" stroke="#666" strokeWidth="1" />
+      <circle cx="-3" cy={NET} r="3.5" fill="#aaa" stroke="#777" strokeWidth="1.5" />
+      <circle cx={CW + 3} cy={NET} r="3.5" fill="#aaa" stroke="#777" strokeWidth="1.5" />
+      {/* Net cable */}
+      <line x1="-3" y1={NET} x2={CW + 3} y2={NET} stroke="#ccc" strokeWidth="0.8" />
 
-      {/* Service lines - 6.95m from back wall = ~3m from net = 61 units from center */}
-      <line x1="0" y1={COURT_HEIGHT / 2 - 61} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 - 61} stroke="white" strokeWidth="1.5" />
-      <line x1="0" y1={COURT_HEIGHT / 2 + 61} x2={COURT_WIDTH} y2={COURT_HEIGHT / 2 + 61} stroke="white" strokeWidth="1.5" />
+      {/* Service lines */}
+      <line x1="0" y1={NET - SL} x2={CW} y2={NET - SL} stroke="white" strokeWidth="1.5" />
+      <line x1="0" y1={NET + SL} x2={CW} y2={NET + SL} stroke="white" strokeWidth="1.5" />
 
       {/* Center service lines */}
-      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2 - 61} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2} stroke="white" strokeWidth="1.5" />
-      <line x1={COURT_WIDTH / 2} y1={COURT_HEIGHT / 2} x2={COURT_WIDTH / 2} y2={COURT_HEIGHT / 2 + 61} stroke="white" strokeWidth="1.5" />
+      <line x1={CW / 2} y1={NET - SL} x2={CW / 2} y2={NET} stroke="white" strokeWidth="1.5" />
+      <line x1={CW / 2} y1={NET} x2={CW / 2} y2={NET + SL} stroke="white" strokeWidth="1.5" />
 
-      {/* Distance markers (subtle) */}
-      {/* 3m mark from net */}
-      <text x={COURT_WIDTH + 12} y={COURT_HEIGHT / 2 + 61} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="7">3m</text>
-      {/* 7m mark from net to back wall */}
-      <text x={COURT_WIDTH + 12} y={COURT_HEIGHT / 2 + 61 + 70} textAnchor="middle" fill="rgba(255,255,255,0.15)" fontSize="7">7m</text>
-      {/* Net label */}
-      <text x={COURT_WIDTH + 14} y={COURT_HEIGHT / 2 + 3} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="7">net</text>
+      {/* === METER MARKINGS (subtle) === */}
+      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(m => (
+        <React.Fragment key={m}>
+          {/* Your side */}
+          <line x1={-2} y1={NET + m * 20} x2={2} y2={NET + m * 20} stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+          {/* Opponent side */}
+          <line x1={-2} y1={NET - m * 20} x2={2} y2={NET - m * 20} stroke="rgba(255,255,255,0.15)" strokeWidth="0.8" />
+        </React.Fragment>
+      ))}
+      {/* Key distance labels */}
+      <text x={-10} y={NET + SL + 3} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="6">3m</text>
+      <text x={-10} y={CH - 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="6">10m</text>
+      <text x={-10} y={NET + 4} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="6">net</text>
 
-      {/* Side labels */}
-      <text x={COURT_WIDTH / 2} y={COURT_HEIGHT - 10} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontWeight="bold">
+      {/* === LABELS === */}
+      <text x={CW / 2} y={CH - 8} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="11" fontWeight="bold">
         JOUW KANT
       </text>
-      <text x={COURT_WIDTH / 2} y="15" textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="12" fontWeight="bold">
+      <text x={CW / 2} y={14} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="11" fontWeight="bold">
         TEGENSTANDER
       </text>
-
-      {/* Left/Right labels */}
-      <text x="25" y={COURT_HEIGHT - 25} textAnchor="middle" fill={playerSide === 'left' ? 'rgba(0,191,255,0.3)' : 'rgba(255,255,255,0.15)'} fontSize="9" fontWeight={playerSide === 'left' ? 'bold' : 'normal'}>
+      <text x="30" y={CH - 22} textAnchor="middle" fill={playerSide === 'left' ? 'rgba(0,191,255,0.35)' : 'rgba(255,255,255,0.12)'} fontSize="8" fontWeight={playerSide === 'left' ? 'bold' : 'normal'}>
         {leftLabel}
       </text>
-      <text x={COURT_WIDTH - 25} y={COURT_HEIGHT - 25} textAnchor="middle" fill={playerSide === 'right' ? 'rgba(0,191,255,0.3)' : 'rgba(255,255,255,0.15)'} fontSize="9" fontWeight={playerSide === 'right' ? 'bold' : 'normal'}>
+      <text x={CW - 30} y={CH - 22} textAnchor="middle" fill={playerSide === 'right' ? 'rgba(0,191,255,0.35)' : 'rgba(255,255,255,0.12)'} fontSize="8" fontWeight={playerSide === 'right' ? 'bold' : 'normal'}>
         {rightLabel}
       </text>
 
-      {/* Zone highlights */}
+      {/* === SCENARIO OVERLAYS === */}
       {scenario.zones?.map((zone, i) => (
         <ZoneHighlight key={i} zone={zone} />
       ))}
 
-      {/* Movement arrows */}
       {showMovement && scenario.movements?.map((movement, i) => (
         <MovementArrow key={i} movement={movement} visible={animationStep >= (movement.step ?? 0)} />
       ))}
 
-      {/* Pattern overlay (step-by-step sequences) */}
       {scenario.pattern && (
-        <PatternOverlay
-          pattern={scenario.pattern}
-          animationStep={animationStep}
-          showMovement={showMovement}
-        />
+        <PatternOverlay pattern={scenario.pattern} animationStep={animationStep} showMovement={showMovement} />
       )}
 
-      {/* Technique overlay (trajectories, contact point, spin) */}
       {scenario.technique && (
-        <TechniqueOverlay
-          technique={scenario.technique}
-          animationStep={animationStep}
-          showMovement={showMovement}
-        />
+        <TechniqueOverlay technique={scenario.technique} animationStep={animationStep} showMovement={showMovement} />
       )}
 
-      {/* Ball position */}
       {scenario.ball && (
         <BallMarker x={scenario.ball.x} y={scenario.ball.y} />
       )}
 
-      {/* Player positions */}
       {scenario.players.map((player, i) => (
         <PlayerMarker key={i} player={player} />
       ))}
