@@ -98,9 +98,12 @@ export interface Scenario {
   pattern?: PatternInfo
 }
 
-// Court constants (viewBox 200x400)
+// Court constants (viewBox 200x400, scale: 1m = 20 units)
 // Your side = bottom half (y: 200-400)
 // Opponent side = top half (y: 0-200)
+// Net = y: 200
+// Service line your side = y: 339 (6.95m from net, 3.05m from back wall)
+// Service line opponent = y: 61
 // Right side = x: 100-200 (YOUR side, since you play right)
 // Left side = x: 0-100
 

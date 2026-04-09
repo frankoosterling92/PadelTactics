@@ -21,7 +21,7 @@ interface PadelCourtProps {
 const CW = 200  // court width (10m)
 const CH = 400  // court height (20m)
 const NET = CH / 2  // net at center (200)
-const SL = 61       // service line: 3.05m from net
+const SL = 139      // service line: 6.95m from net (3.05m from back wall)
 const WALL_SIDE_GLASS = 80 // side glass: 4m from each back wall
 const PAD = 16 // padding around court
 
@@ -130,9 +130,10 @@ export const PadelCourt: React.FC<PadelCourtProps> = ({ scenario, showMovement, 
         </React.Fragment>
       ))}
       {/* Key distance labels */}
-      <text x={-10} y={NET + SL + 3} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="6">3m</text>
+      <text x={-10} y={NET + SL + 3} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="6">6.95m</text>
       <text x={-10} y={CH - 2} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="6">10m</text>
       <text x={-10} y={NET + 4} textAnchor="middle" fill="rgba(255,255,255,0.3)" fontSize="6">net</text>
+      <text x={-10} y={CH - 30} textAnchor="middle" fill="rgba(255,255,255,0.2)" fontSize="6">3.05m</text>
 
       {/* === LABELS === */}
       <text x={CW / 2} y={CH - 8} textAnchor="middle" fill="rgba(255,255,255,0.25)" fontSize="11" fontWeight="bold">
