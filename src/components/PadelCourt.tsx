@@ -22,7 +22,6 @@ const CW = 200  // court width (10m)
 const CH = 400  // court height (20m)
 const NET = CH / 2  // net at center (200)
 const SL = 61       // service line: 3.05m from net
-const WALL_GLASS = 60   // glass back wall: 3m high (visual thickness = 6)
 const WALL_SIDE_GLASS = 80 // side glass: 4m from each back wall
 const PAD = 16 // padding around court
 
