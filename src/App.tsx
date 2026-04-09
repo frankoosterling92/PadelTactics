@@ -1,8 +1,10 @@
 import { useState, useMemo } from 'react'
 import { PadelCourt } from './components/PadelCourt'
 import { ScenarioSelector } from './components/ScenarioSelector'
+import { ScenarioDropdown } from './components/ScenarioDropdown'
 import { TipsPanel } from './components/TipsPanel'
 import { PlaybackSlider } from './components/PlaybackSlider'
+import { MobileDetail } from './components/MobileDetail'
 import { scenarios, type Scenario } from './data/scenarios'
 import { mirrorScenario } from './utils/mirrorScenario'
 
@@ -14,9 +16,7 @@ function App() {
   const [animationStep, setAnimationStep] = useState(10)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [playerSide, setPlayerSide] = useState<PlayerSide>('right')
-  const [mobileTab, setMobileTab] = useState<'court' | 'scenarios' | 'tips'>('court')
 
-  // Mirror the scenario if playing from the left side
   const displayScenario = useMemo(() => {
     return playerSide === 'left' ? mirrorScenario(selectedScenario) : selectedScenario
   }, [selectedScenario, playerSide])
@@ -38,11 +38,7 @@ function App() {
     setSelectedScenario(scenario)
     setShowMovement(true)
     setAnimationStep(scenario.pattern ? 0 : 10)
-    // On mobile, switch to court view after selecting
-    setMobileTab('court')
   }
-
-  const sideLabel = playerSide === 'right' ? 'rechterspeler' : 'linkerspeler'
 
   return (
     <div className="app">
@@ -52,7 +48,6 @@ function App() {
           <button
             className="menu-toggle desktop-only"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            title={sidebarOpen ? 'Verberg menu' : 'Toon menu'}
           >
             {sidebarOpen ? '\u2715' : '\u2630'}
           </button>
@@ -66,53 +61,59 @@ function App() {
             <button
               className={`side-btn ${playerSide === 'left' ? 'active' : ''}`}
               onClick={() => setPlayerSide('left')}
-            >
-              Links
-            </button>
+            >L</button>
             <button
               className={`side-btn ${playerSide === 'right' ? 'active' : ''}`}
               onClick={() => setPlayerSide('right')}
-            >
-              Rechts
-            </button>
+            >R</button>
           </div>
-          <p className="app-subtitle desktop-only">Tactiek voor de {sideLabel}</p>
+          <p className="app-subtitle desktop-only">
+            Tactiek voor de {playerSide === 'right' ? 'rechterspeler' : 'linkerspeler'}
+          </p>
         </div>
       </header>
 
-      {/* Mobile tab bar */}
-      <nav className="mobile-tabs mobile-only">
-        <button
-          className={`mobile-tab ${mobileTab === 'scenarios' ? 'active' : ''}`}
-          onClick={() => setMobileTab('scenarios')}
-        >
-          {'\u{1F4CB}'} Scenario's
-        </button>
-        <button
-          className={`mobile-tab ${mobileTab === 'court' ? 'active' : ''}`}
-          onClick={() => setMobileTab('court')}
-        >
-          {'\u{1F3BE}'} Baan
-        </button>
-        <button
-          className={`mobile-tab ${mobileTab === 'tips' ? 'active' : ''}`}
-          onClick={() => setMobileTab('tips')}
-        >
-          {'\u{1F4A1}'} Tips
-        </button>
-      </nav>
+      {/* ===== MOBILE LAYOUT ===== */}
+      <div className="mobile-layout mobile-only">
+        {/* Scenario dropdown */}
+        <ScenarioDropdown selected={selectedScenario} onSelect={handleSelectScenario} />
 
-      <div className="app-content">
-        {/* Sidebar with scenario selector */}
-        <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'} ${mobileTab === 'scenarios' ? 'mobile-visible' : 'mobile-hidden'}`}>
-          <ScenarioSelector
-            selectedId={selectedScenario.id}
-            onSelect={handleSelectScenario}
+        {/* Court */}
+        <div className="mobile-court">
+          <PadelCourt
+            scenario={displayScenario}
+            showMovement={showMovement}
+            animationStep={animationStep}
+            playerSide={playerSide}
           />
+        </div>
+
+        {/* Slider */}
+        <PlaybackSlider
+          scenario={displayScenario}
+          animationStep={animationStep}
+          maxSteps={maxSteps}
+          onStepChange={setAnimationStep}
+          showMovement={showMovement}
+          onToggleMovement={() => setShowMovement(!showMovement)}
+        />
+
+        {/* Compact detail + expandable tips */}
+        <MobileDetail
+          scenario={displayScenario}
+          animationStep={animationStep}
+          maxSteps={maxSteps}
+          onStepChange={setAnimationStep}
+        />
+      </div>
+
+      {/* ===== DESKTOP LAYOUT ===== */}
+      <div className="desktop-layout desktop-only">
+        <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+          <ScenarioSelector selectedId={selectedScenario.id} onSelect={handleSelectScenario} />
         </aside>
 
-        {/* Main content */}
-        <main className={`main-content ${mobileTab === 'court' ? 'mobile-visible' : 'mobile-hidden'}`}>
+        <main className="main-content">
           <div className="court-and-slider">
             <div className="court-container">
               <PadelCourt
@@ -133,8 +134,7 @@ function App() {
           </div>
         </main>
 
-        {/* Tips panel */}
-        <aside className={`tips-sidebar ${mobileTab === 'tips' ? 'mobile-visible' : 'mobile-hidden'}`}>
+        <aside className="tips-sidebar">
           <TipsPanel
             scenario={displayScenario}
             showMovement={showMovement}
