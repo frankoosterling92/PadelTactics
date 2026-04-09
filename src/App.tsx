@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react'
 import { PadelCourt } from './components/PadelCourt'
 import { ScenarioSelector } from './components/ScenarioSelector'
 import { TipsPanel } from './components/TipsPanel'
+import { PlaybackSlider } from './components/PlaybackSlider'
 import { scenarios, type Scenario } from './data/scenarios'
 import { mirrorScenario } from './utils/mirrorScenario'
 
@@ -112,12 +113,22 @@ function App() {
 
         {/* Main content */}
         <main className={`main-content ${mobileTab === 'court' ? 'mobile-visible' : 'mobile-hidden'}`}>
-          <div className="court-container">
-            <PadelCourt
+          <div className="court-and-slider">
+            <div className="court-container">
+              <PadelCourt
+                scenario={displayScenario}
+                showMovement={showMovement}
+                animationStep={animationStep}
+                playerSide={playerSide}
+              />
+            </div>
+            <PlaybackSlider
               scenario={displayScenario}
-              showMovement={showMovement}
               animationStep={animationStep}
-              playerSide={playerSide}
+              maxSteps={maxSteps}
+              onStepChange={setAnimationStep}
+              showMovement={showMovement}
+              onToggleMovement={() => setShowMovement(!showMovement)}
             />
           </div>
         </main>
