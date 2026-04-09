@@ -924,6 +924,8 @@ body {
     overflow: hidden;
     height: 100vh;
     height: 100dvh;
+    position: fixed;
+    width: 100%;
   }
 
   #root {
@@ -934,6 +936,8 @@ body {
   .app {
     height: 100vh;
     height: 100dvh;
+    display: flex;
+    flex-direction: column;
   }
 
   /* Show/hide helpers */
@@ -944,6 +948,7 @@ body {
   .app-header {
     padding: 8px 12px;
     gap: 8px;
+    flex-shrink: 0;
   }
 
   .app-title {
@@ -990,11 +995,12 @@ body {
     background: rgba(0, 191, 255, 0.05);
   }
 
-  /* Content area — full height, panels swap via tabs */
+  /* Content area — fills remaining space */
   .app-content {
     flex: 1;
     overflow: hidden;
     position: relative;
+    min-height: 0;
   }
 
   .mobile-hidden {
@@ -1007,12 +1013,16 @@ body {
 
   /* Sidebar fills screen when visible */
   .sidebar {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     border-right: none;
     overflow-y: auto;
     margin-left: 0;
     opacity: 1;
+    z-index: 2;
+    -webkit-overflow-scrolling: touch;
   }
 
   .sidebar.closed {
@@ -1022,6 +1032,7 @@ body {
 
   .scenario-selector {
     padding: 12px;
+    padding-bottom: 24px;
   }
 
   .category-group {
@@ -1035,35 +1046,45 @@ body {
 
   /* Court fills screen when visible */
   .main-content {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
-    padding: 12px;
+    padding: 8px;
+    display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
+    overflow: hidden;
   }
 
   .court-container {
     max-width: 100%;
-    width: 100%;
-    max-height: 100%;
+    width: auto;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   .padel-court-svg {
-    max-height: calc(100dvh - 110px);
+    height: 100%;
     width: auto;
     max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
   }
 
   /* Tips panel fills screen when visible */
   .tips-sidebar {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     border-left: none;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    z-index: 2;
   }
 
   .tips-panel {
@@ -1112,6 +1133,15 @@ body {
     height: 38px;
     font-size: 14px;
   }
+
+  /* Legend compact on mobile */
+  .court-legend {
+    padding: 12px;
+  }
+
+  .legend-items {
+    gap: 8px;
+  }
 }
 
 /* ========================================
@@ -1130,9 +1160,14 @@ body {
 
   .tips-panel {
     padding: 12px;
+    padding-bottom: 32px;
   }
 
   .scenario-selector {
     padding: 8px;
+  }
+
+  .main-content {
+    padding: 4px;
   }
 }
